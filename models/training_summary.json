@@ -1,0 +1,22 @@
+{
+  "best_model": "xgboost",
+  "test_metrics": {
+    "rmse": 3.082407803854431,
+    "mae": 1.535444736480713,
+    "r2": 0.19831782579421997,
+    "precision": 0.9813914734064714,
+    "recall": 0.5506896283020338,
+    "f1_score": 0.7055006488968754,
+    "auc_roc": 0.9595897411182552
+  },
+  "optimal_thresholds": {
+    "tier1_recall": 0.028396543115377426,
+    "tier2_balanced": 0.0067594838328659534,
+    "ir_precision": 4.9931864738464355,
+    "cost_optimal": 2.4242424242424243
+  },
+  "feature_count": 61,
+  "training_samples": 100778,
+  "validation_samples": 25195,
+  "test_samples": 22544
+}

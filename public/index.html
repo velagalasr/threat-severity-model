@@ -272,6 +272,23 @@
             font-size: 11px;
             opacity: 0.9;
         }
+        
+        .btn-reset {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-reset:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
     </style>
 </head>
 <body>
@@ -318,6 +335,9 @@
                     <div class="dist-label">Critical</div>
                 </div>
             </div>
+            <div style="text-align: center;">
+                <button class="btn-reset" onclick="resetMetrics()">🔄 Reset Metrics</button>
+            </div>
         </div>
         
         <div class="info-box">
@@ -357,14 +377,26 @@
             ? 'http://127.0.0.1:5000'
             : 'https://threat-model-api.mangoriver-796b80ca.centralus.azurecontainerapps.io';
         
-        // Metrics tracking
-        const metrics = {
-            totalPredictions: 0,
-            totalErrors: 0,
-            latencies: [],
-            threatScores: [],
-            riskCounts: { low: 0, medium: 0, high: 0, critical: 0 }
-        };
+        // Metrics tracking with localStorage persistence
+        function loadMetrics() {
+            const saved = localStorage.getItem('threatModelMetrics');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            return {
+                totalPredictions: 0,
+                totalErrors: 0,
+                latencies: [],
+                threatScores: [],
+                riskCounts: { low: 0, medium: 0, high: 0, critical: 0 }
+            };
+        }
+        
+        function saveMetrics() {
+            localStorage.setItem('threatModelMetrics', JSON.stringify(metrics));
+        }
+        
+        const metrics = loadMetrics();
         
         function updateMetrics() {
             document.getElementById('totalPredictions').textContent = metrics.totalPredictions;
@@ -392,6 +424,20 @@
             document.getElementById('mediumCount').textContent = metrics.riskCounts.medium;
             document.getElementById('highCount').textContent = metrics.riskCounts.high;
             document.getElementById('criticalCount').textContent = metrics.riskCounts.critical;
+            
+            // Save to localStorage
+            saveMetrics();
+        }
+        
+        function resetMetrics() {
+            if (confirm('Are you sure you want to reset all metrics?')) {
+                metrics.totalPredictions = 0;
+                metrics.totalErrors = 0;
+                metrics.latencies = [];
+                metrics.threatScores = [];
+                metrics.riskCounts = { low: 0, medium: 0, high: 0, critical: 0 };
+                updateMetrics();
+            }
         }
         
         function getRiskCategory(score) {
@@ -611,6 +657,11 @@
             if (e.ctrlKey && e.key === 'Enter') {
                 predictThreat();
             }
+        });
+        
+        // Load metrics on page load
+        window.addEventListener('DOMContentLoaded', function() {
+            updateMetrics();
         });
     </script>
 </body>

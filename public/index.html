@@ -21,7 +21,7 @@
         }
         
         .metrics-sidebar {
-            width: 320px;
+            width: 420px;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
             padding: 20px;
@@ -35,12 +35,12 @@
         }
         
         .metrics-sidebar.collapsed {
-            margin-left: -320px;
+            margin-left: -420px;
         }
         
         .toggle-metrics {
             position: fixed;
-            left: 320px;
+            left: 420px;
             top: 20px;
             background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
             color: white;
@@ -59,7 +59,7 @@
         
         .container {
             flex: 1;
-            margin-left: 340px;
+            margin-left: 440px;
             margin-right: 20px;
             margin-top: 20px;
             margin-bottom: 20px;
@@ -297,6 +297,23 @@
             font-weight: 600;
         }
         
+        .tab-btn.mockup-tab {
+            background: rgba(251, 191, 36, 0.15);
+            color: rgba(251, 191, 36, 0.9);
+            border: 1px solid rgba(251, 191, 36, 0.3);
+        }
+        
+        .tab-btn.mockup-tab:hover {
+            background: rgba(251, 191, 36, 0.25);
+            color: #fbbf24;
+        }
+        
+        .tab-btn.mockup-tab.active {
+            background: rgba(251, 191, 36, 0.35);
+            color: #fbbf24;
+            border-color: rgba(251, 191, 36, 0.5);
+        }
+        
         .tab-content {
             display: none;
         }
@@ -491,12 +508,13 @@
             <!-- Tab Navigation -->
             <div class="tab-navigation">
                 <button class="tab-btn active" onclick="switchTab('realtime')">Real-time</button>
+                <button class="tab-btn" onclick="switchTab('about')">About</button>
                 <button class="tab-btn" onclick="switchTab('performance')">Performance</button>
                 <button class="tab-btn" onclick="switchTab('comparison')">Models</button>
                 <button class="tab-btn" onclick="switchTab('training')">Training</button>
-                <button class="tab-btn" onclick="switchTab('datadrift')">Data Drift</button>
-                <button class="tab-btn" onclick="switchTab('modeldrift')">Model Drift</button>
-                <button class="tab-btn" onclick="switchTab('operational')">Operational</button>
+                <button class="tab-btn mockup-tab" onclick="switchTab('datadrift')" title="Mockup Data">Data Drift 📋</button>
+                <button class="tab-btn mockup-tab" onclick="switchTab('modeldrift')" title="Mockup Data">Model Drift 📋</button>
+                <button class="tab-btn mockup-tab" onclick="switchTab('operational')" title="Mockup Data">Operational 📋</button>
             </div>
             
             <!-- Real-time Tab -->
@@ -538,6 +556,54 @@
                     </div>
                 </div>
                 <button class="btn-reset" onclick="resetMetrics()">🔄 Reset Metrics</button>
+            </div>
+            
+            <!-- About Tab -->
+            <div id="tab-about" class="tab-content">
+                <div class="metric-card">
+                    <div class="metric-label">📚 NSL-KDD Dataset</div>
+                    <div style="font-size: 11px; line-height: 1.7; opacity: 0.95;">
+                        <p style="margin-bottom: 10px;"><b>NSL-KDD</b> stands for <b>Network Security Laboratory - Knowledge Discovery in Databases</b> dataset. It's an improved version of the KDD Cup 1999 dataset, widely used for network intrusion detection research.</p>
+                        
+                        <table class="metric-table" style="margin: 10px 0;">
+                            <tr><td>Total Records</td><td>148,517</td></tr>
+                            <tr><td>Features</td><td>41 (raw) → 61 (engineered)</td></tr>
+                            <tr><td>Classes</td><td>Normal + 4 Attack Types</td></tr>
+                        </table>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">🚨 Attack Categories</div>
+                    <div style="font-size: 11px; line-height: 1.7; opacity: 0.95;">
+                        <div style="margin-bottom: 12px; padding: 8px; background: rgba(239, 68, 68, 0.15); border-radius: 5px;">
+                            <b>DoS (Denial of Service):</b><br>
+                            Attacks that make computer or network resources unavailable by overwhelming the system with requests. Examples: SYN flood, ping flood, teardrop attacks.
+                        </div>
+                        
+                        <div style="margin-bottom: 12px; padding: 8px; background: rgba(251, 191, 36, 0.15); border-radius: 5px;">
+                            <b>Probe (Surveillance):</b><br>
+                            Reconnaissance attacks to gather information about network vulnerabilities. Examples: port scanning, network mapping, vulnerability scanning.
+                        </div>
+                        
+                        <div style="margin-bottom: 12px; padding: 8px; background: rgba(168, 85, 247, 0.15); border-radius: 5px;">
+                            <b>R2L (Remote to Local):</b><br>
+                            Unauthorized access from remote machine to gain local access. Examples: password guessing, FTP write attacks, phishing, social engineering.
+                        </div>
+                        
+                        <div style="padding: 8px; background: rgba(59, 130, 246, 0.15); border-radius: 5px;">
+                            <b>U2R (User to Root):</b><br>
+                            Privilege escalation attacks where attacker gains root/administrator access from normal user account. Examples: buffer overflow, rootkit installation, privilege exploitation.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">🎯 Model Purpose</div>
+                    <div style="font-size: 11px; line-height: 1.7; opacity: 0.95;">
+                        This XGBoost-based model analyzes network traffic patterns and predicts <b>threat severity scores (0-10)</b> to help security teams prioritize incident response. It was trained on 100,778 samples with 61 engineered features including protocol patterns, connection rates, error ratios, and service behaviors.
+                    </div>
+                </div>
             </div>
             
             <!-- Model Selection Tab -->
@@ -641,9 +707,58 @@
                         <tr><td>F1-Score</td><td>70.6%</td></tr>
                         <tr><td>AUC-ROC</td><td>0.960</td></tr>
                     </table>
-                    <small style="opacity: 0.7; font-size: 10px; display: block; margin-top: 8px;">
-                        High precision (98%) minimizes false alarms. Lower recall tuned for cost-optimal threshold.
-                    </small>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 10px;">
+                        <div style="margin-bottom: 6px;">• <b>Precision:</b> % of predicted threats that are real (fewer false alarms)</div>
+                        <div style="margin-bottom: 6px;">• <b>Recall:</b> % of actual threats detected (coverage)</div>
+                        <div style="margin-bottom: 6px;">• <b>F1-Score:</b> Balanced measure of precision & recall</div>
+                        <div>• <b>AUC-ROC:</b> Ability to distinguish threat levels (higher = better)</div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Confusion Matrix (Test Set - Binary)</div>
+                    <div style="font-size: 10px; text-align: center; margin: 10px 0 5px 0; font-weight: 600; opacity: 0.7;">
+                        Predicted Class →
+                    </div>
+                    <div style="display: grid; grid-template-columns: 70px 1fr 1fr; gap: 8px; margin-top: 5px; font-size: 10px;">
+                        <!-- Header Row -->
+                        <div></div>
+                        <div style="text-align: center; font-weight: 600; opacity: 0.7; padding: 5px;">Normal</div>
+                        <div style="text-align: center; font-weight: 600; opacity: 0.7; padding: 5px;">Threat</div>
+                        
+                        <!-- Row 1: Actual Normal -->
+                        <div style="display: flex; align-items: center; justify-content: flex-end; padding-right: 5px; font-weight: 600; opacity: 0.7;">Normal</div>
+                        <div style="background: rgba(74, 222, 128, 0.3); padding: 12px; border-radius: 5px; text-align: center;">
+                            <div style="font-size: 16px; font-weight: bold; color: #22c55e;">13,592</div>
+                            <div style="opacity: 0.8; margin-top: 2px; font-size: 9px;">TN ✓</div>
+                        </div>
+                        <div style="background: rgba(239, 68, 68, 0.3); padding: 12px; border-radius: 5px; text-align: center;">
+                            <div style="font-size: 16px; font-weight: bold; color: #ef4444;">92</div>
+                            <div style="opacity: 0.8; margin-top: 2px; font-size: 9px;">FP ✗</div>
+                        </div>
+                        
+                        <!-- Row 2: Actual Threat -->
+                        <div style="display: flex; align-items: center; justify-content: flex-end; padding-right: 5px; font-weight: 600; opacity: 0.7;">Threat</div>
+                        <div style="background: rgba(239, 68, 68, 0.3); padding: 12px; border-radius: 5px; text-align: center;">
+                            <div style="font-size: 16px; font-weight: bold; color: #ef4444;">3,981</div>
+                            <div style="opacity: 0.8; margin-top: 2px; font-size: 9px;">FN ✗</div>
+                        </div>
+                        <div style="background: rgba(74, 222, 128, 0.3); padding: 12px; border-radius: 5px; text-align: center;">
+                            <div style="font-size: 16px; font-weight: bold; color: #22c55e;">4,879</div>
+                            <div style="opacity: 0.8; margin-top: 2px; font-size: 9px;">TP ✓</div>
+                        </div>
+                    </div>
+                    <div style="font-size: 9px; text-align: center; margin-top: 5px; opacity: 0.7;">
+                        ← Actual Class
+                    </div>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 10px;">
+                        <div style="margin-bottom: 4px;">• <b>TN:</b> Normal traffic correctly identified (13,592)</div>
+                        <div style="margin-bottom: 4px;">• <b>TP:</b> Threats correctly detected (4,879)</div>
+                        <div style="margin-bottom: 4px;">• <b>FP:</b> False alarms - only 92 (0.4% of predictions)</div>
+                        <div>• <b>FN:</b> Missed threats - 3,981 (44.9% of threats)</div>
+                    </div>
+                    <div style="background: rgba(59, 130, 246, 0.15); padding: 8px; border-radius: 5px; margin-top: 10px; font-size: 10px;">
+                        <b>Overall Accuracy:</b> 82.0% | <b>Total Samples:</b> 22,544
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Regression Metrics</div>
@@ -652,6 +767,11 @@
                         <tr><td>MAE</td><td>1.54</td></tr>
                         <tr><td>R² Score</td><td>0.198</td></tr>
                     </table>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 10px;">
+                        <div style="margin-bottom: 6px;">• <b>RMSE:</b> Root Mean Square Error - avg prediction error magnitude</div>
+                        <div style="margin-bottom: 6px;">• <b>MAE:</b> Mean Absolute Error - avg deviation from actual score</div>
+                        <div>• <b>R² Score:</b> How well predictions fit actual values (1.0 = perfect)</div>
+                    </div>
                 </div>
             </div>
             
@@ -732,21 +852,6 @@
                     </div>
                 </div>
             </div>
-                    <small style="opacity: 0.7; font-size: 10px; display: block; margin-top: 5px;">Baseline - fastest but lowest accuracy</small>
-                </div>
-                
-                <div class="metric-card" style="background: rgba(255, 255, 255, 0.05);">
-                    <div class="metric-label">Why XGBoost?</div>
-                    <div style="font-size: 11px; line-height: 1.6; opacity: 0.9;">
-                        • <b>Best RMSE</b> on validation set<br>
-                        • <b>98.1% precision</b> minimizes false alarms<br>
-                        • <b>96% AUC-ROC</b> excellent discrimination<br>
-                        • Handles <b>class imbalance</b> well<br>
-                        • Only <b>12ms inference</b> (acceptable)<br>
-                        • <b>Feature importance</b> via SHAP<br>
-                    </div>
-                </div>
-            </div>
             
             <!-- Training Metrics Tab -->
             <div id="tab-training" class="tab-content">
@@ -758,6 +863,9 @@
                         <tr><td>Test R²</td><td>0.198</td></tr>
                         <tr><td>Test AUC-ROC</td><td>0.960</td></tr>
                     </table>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        Final model evaluation on unseen test data (22,544 samples). Shows real-world prediction accuracy.
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Optimal Thresholds</div>
@@ -766,6 +874,9 @@
                         <tr><td>IR Precision</td><td>4.99</td></tr>
                         <tr><td>Balanced</td><td>0.007</td></tr>
                     </table>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        Decision thresholds for classifying threats. <b>Cost Optimal</b> balances investigation cost vs. missed threats. <b>IR Precision</b> minimizes false alarms for incident response teams.
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Dataset Info</div>
@@ -776,11 +887,17 @@
                         <tr><td>Val Samples</td><td>25,195</td></tr>
                         <tr><td>Test Samples</td><td>22,544</td></tr>
                     </table>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        Model trained on 100K samples, validated on 25K, tested on 22K. Feature engineering added 20 security-specific features.
+                    </div>
                 </div>
             </div>
             
             <!-- Data Drift Tab -->
             <div id="tab-datadrift" class="tab-content">
+                <div style="background: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 6px; padding: 8px; margin-bottom: 15px; font-size: 10px; text-align: center;">
+                    📋 <b>MOCKUP DATA</b> - Simulated monitoring metrics for demonstration
+                </div>
                 <div class="metric-card">
                     <div class="metric-label">Population Stability Index</div>
                     <table class="metric-table">
@@ -789,6 +906,9 @@
                         <tr><td>Protocol Type</td><td>0.12<span class="drift-indicator drift-moderate">⚠</span></td></tr>
                         <tr><td>Src Bytes</td><td>0.24<span class="drift-indicator drift-high">!</span></td></tr>
                     </table>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        <b>PSI</b> measures changes in input data distribution. <0.1 = stable, 0.1-0.2 = moderate shift, >0.2 = significant drift requiring retraining.
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">KS Test Results</div>
@@ -797,6 +917,9 @@
                         <tr><td>Avg P-value</td><td>0.127</td></tr>
                         <tr><td>Max KS Stat</td><td>0.183</td></tr>
                     </table>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        <b>Kolmogorov-Smirnov test</b> compares training vs. production data. Failed tests indicate features with significantly different distributions.
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Feature Statistics</div>
@@ -805,11 +928,17 @@
                         <tr><td>Std Shift</td><td>+12.1%</td></tr>
                         <tr><td>JS Divergence</td><td>0.046</td></tr>
                     </table>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        Statistical changes in features. <b>JS Divergence</b> measures distribution similarity (0 = identical, 1 = completely different).
+                    </div>
                 </div>
             </div>
             
             <!-- Model Drift Tab -->
             <div id="tab-modeldrift" class="tab-content">
+                <div style="background: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 6px; padding: 8px; margin-bottom: 15px; font-size: 10px; text-align: center;">
+                    📋 <b>MOCKUP DATA</b> - Simulated monitoring metrics for demonstration
+                </div>
                 <div class="metric-card">
                     <div class="metric-label">Performance Degradation</div>
                     <table class="metric-table">
@@ -820,6 +949,9 @@
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 93.1%; background: linear-gradient(90deg, #fbbf24, #f59e0b);"></div>
                     </div>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        Model accuracy decay over time due to changing network patterns. >5% drop triggers retraining alert.
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Error Rate Trends</div>
@@ -828,6 +960,9 @@
                         <tr><td>False Negatives</td><td>+8%</td></tr>
                         <tr><td>Overall Error</td><td>+11%</td></tr>
                     </table>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        Increase in prediction errors since deployment. FP = normal traffic flagged as threat, FN = missed real threats.
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Calibration & Importance</div>
@@ -836,11 +971,17 @@
                         <tr><td>SHAP Shift</td><td>12.3%</td></tr>
                         <tr><td>Top Feature Stable</td><td>Yes</td></tr>
                     </table>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        <b>Calibration:</b> How well predicted probabilities match reality. <b>SHAP Shift:</b> Changes in feature importance patterns.
+                    </div>
                 </div>
             </div>
             
             <!-- Operational Tab -->
             <div id="tab-operational" class="tab-content">
+                <div style="background: rgba(251, 191, 36, 0.2); border: 1px solid rgba(251, 191, 36, 0.4); border-radius: 6px; padding: 8px; margin-bottom: 15px; font-size: 10px; text-align: center;">
+                    📋 <b>MOCKUP DATA</b> - Simulated monitoring metrics for demonstration
+                </div>
                 <div class="metric-card">
                     <div class="metric-label">Latency (ms)</div>
                     <table class="metric-table">
@@ -851,6 +992,9 @@
                     <div class="progress-bar">
                         <div class="progress-fill" style="width: 78%;"></div>
                     </div>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        Response time percentiles. <b>P50:</b> 50% of requests faster than this. <b>P95:</b> 95% faster. <b>P99:</b> worst 1% of requests.
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Throughput & Errors</div>
@@ -859,6 +1003,9 @@
                         <tr><td>Total Requests</td><td>1.2M</td></tr>
                         <tr><td>Failed Requests</td><td>0.3%</td></tr>
                     </table>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        API load metrics. Shows prediction volume and reliability. Failed requests include timeouts, errors, and invalid inputs.
+                    </div>
                 </div>
                 <div class="metric-card">
                     <div class="metric-label">Resource Usage</div>
@@ -867,6 +1014,9 @@
                         <tr><td>Memory</td><td>1.2 / 2.0 GB</td></tr>
                         <tr><td>Container Uptime</td><td>3d 14h</td></tr>
                     </table>
+                    <div style="font-size: 10px; opacity: 0.8; line-height: 1.5; margin-top: 8px;">
+                        Azure Container Apps resource consumption. Shows system health and scalability headroom.
+                    </div>
                 </div>
             </div>
         </div>
@@ -1143,6 +1293,55 @@
             }
         }
         
+        // Feature descriptions for SHAP explanations
+        const featureDescriptions = {
+            'duration': 'Connection length in seconds',
+            'protocol_type': 'Network protocol (TCP/UDP/ICMP)',
+            'service': 'Network service type (HTTP, FTP, SSH, etc.)',
+            'flag': 'Connection status flag (normal, error, rejected)',
+            'src_bytes': 'Data bytes sent from source',
+            'dst_bytes': 'Data bytes sent to destination',
+            'land': 'Source and destination IP/port are same',
+            'wrong_fragment': 'Number of wrong fragments',
+            'urgent': 'Number of urgent packets',
+            'hot': 'Number of hot indicators (system files access)',
+            'num_failed_logins': 'Failed login attempts count',
+            'logged_in': 'Successfully logged in (1=yes, 0=no)',
+            'num_compromised': 'Number of compromised conditions',
+            'root_shell': 'Root shell obtained (privilege escalation)',
+            'su_attempted': 'Su root command attempted',
+            'num_root': 'Number of root accesses',
+            'num_file_creations': 'Number of file creation operations',
+            'num_shells': 'Number of shell prompts',
+            'num_access_files': 'Number of access control file operations',
+            'num_outbound_cmds': 'Number of outbound commands',
+            'is_host_login': 'Host-based login (1=yes, 0=no)',
+            'is_guest_login': 'Guest login (1=yes, 0=no)',
+            'count': 'Connections to same host in past 2 seconds',
+            'srv_count': 'Connections to same service in past 2 seconds',
+            'serror_rate': 'SYN error rate percentage',
+            'srv_serror_rate': 'Service SYN error rate',
+            'rerror_rate': 'REJ error rate percentage',
+            'srv_rerror_rate': 'Service REJ error rate',
+            'same_srv_rate': 'Same service rate percentage',
+            'diff_srv_rate': 'Different service rate percentage',
+            'srv_diff_host_rate': 'Service different host rate',
+            'dst_host_count': 'Destination host count',
+            'dst_host_srv_count': 'Destination host service count',
+            'dst_host_same_srv_rate': 'Destination same service rate',
+            'dst_host_diff_srv_rate': 'Destination different service rate',
+            'dst_host_same_src_port_rate': 'Destination same source port rate',
+            'dst_host_srv_diff_host_rate': 'Destination service different host rate',
+            'dst_host_serror_rate': 'Destination host SYN error rate',
+            'dst_host_srv_serror_rate': 'Destination host service SYN error rate',
+            'dst_host_rerror_rate': 'Destination host REJ error rate',
+            'dst_host_srv_rerror_rate': 'Destination host service REJ error rate'
+        };
+        
+        function getFeatureDescription(featureName) {
+            return featureDescriptions[featureName] || 'Engineered security feature';
+        }
+        
         function displayResult(data) {
             const resultDiv = document.getElementById('result');
             const riskClass = `risk-${data.risk_level}`;
@@ -1179,12 +1378,18 @@
                 
                 data.top_contributors.forEach(contributor => {
                     const valueColor = contributor.contribution > 0 ? '#e74c3c' : '#27ae60';
+                    const description = getFeatureDescription(contributor.feature);
                     html += `
-                        <div class="contributor-item">
-                            <span>${contributor.feature}</span>
-                            <span style="color: ${valueColor}; font-weight: 600;">
-                                ${contributor.contribution > 0 ? '+' : ''}${contributor.contribution.toFixed(4)}
-                            </span>
+                        <div class="contributor-item" style="flex-direction: column; align-items: flex-start;">
+                            <div style="display: flex; justify-content: space-between; width: 100%;">
+                                <span style="font-weight: 600;">${contributor.feature}</span>
+                                <span style="color: ${valueColor}; font-weight: 600;">
+                                    ${contributor.contribution > 0 ? '+' : ''}${contributor.contribution.toFixed(4)}
+                                </span>
+                            </div>
+                            <div style="font-size: 11px; color: #666; margin-top: 3px; opacity: 0.85;">
+                                ${description}
+                            </div>
                         </div>
                     `;
                 });

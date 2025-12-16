@@ -15,16 +15,63 @@
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
+            padding: 0;
+            margin: 0;
+            display: flex;
+        }
+        
+        .metrics-sidebar {
+            width: 320px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
             padding: 20px;
+            overflow-y: auto;
+            transition: margin-left 0.3s ease;
+            position: fixed;
+            height: 100vh;
+            left: 0;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .metrics-sidebar.collapsed {
+            margin-left: -320px;
+        }
+        
+        .toggle-metrics {
+            position: fixed;
+            left: 320px;
+            top: 20px;
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 0 8px 8px 0;
+            cursor: pointer;
+            z-index: 999;
+            transition: left 0.3s ease;
+            font-size: 18px;
+        }
+        
+        .toggle-metrics.collapsed {
+            left: 0;
         }
         
         .container {
-            max-width: 900px;
-            margin: 0 auto;
+            flex: 1;
+            margin-left: 340px;
+            margin-right: 20px;
+            margin-top: 20px;
+            margin-bottom: 20px;
             background: white;
             border-radius: 15px;
             box-shadow: 0 20px 60px rgba(0,0,0,0.3);
             padding: 30px;
+            transition: margin-left 0.3s ease;
+        }
+        
+        .container.sidebar-collapsed {
+            margin-left: 20px;
         }
         
         h1 {
@@ -207,23 +254,21 @@
         }
         
         .metrics-panel {
-            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 25px;
             color: white;
         }
         
         .metrics-header {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 600;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             text-align: center;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
         }
         
         .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            display: flex;
+            flex-direction: column;
             gap: 15px;
         }
         
@@ -231,18 +276,19 @@
             background: rgba(255, 255, 255, 0.1);
             border-radius: 8px;
             padding: 15px;
-            text-align: center;
             backdrop-filter: blur(10px);
         }
         
         .metric-label {
-            font-size: 12px;
-            opacity: 0.9;
-            margin-bottom: 5px;
+            font-size: 11px;
+            opacity: 0.8;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .metric-value {
-            font-size: 24px;
+            font-size: 28px;
             font-weight: bold;
         }
         
@@ -252,53 +298,84 @@
         }
         
         .threat-distribution {
-            display: flex;
-            justify-content: space-around;
-            margin-top: 15px;
-            padding-top: 15px;
-            border-top: 1px solid rgba(255, 255, 255, 0.2);
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid rgba(255, 255, 255, 0.3);
         }
         
         .dist-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 12px;
+            border-radius: 8px;
             text-align: center;
         }
         
         .dist-count {
-            font-size: 20px;
+            font-size: 24px;
             font-weight: bold;
+            margin-bottom: 5px;
         }
         
         .dist-label {
-            font-size: 11px;
+            font-size: 10px;
             opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .btn-reset {
             background: rgba(255, 255, 255, 0.2);
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 8px 16px;
+            padding: 10px 16px;
             border-radius: 6px;
             cursor: pointer;
             font-size: 13px;
-            margin-top: 10px;
+            margin-top: 20px;
+            width: 100%;
             transition: all 0.3s;
         }
         
         .btn-reset:hover {
             background: rgba(255, 255, 255, 0.3);
-            transform: scale(1.05);
+        }
+        
+        @media (max-width: 768px) {
+            .metrics-sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            
+            .metrics-sidebar.collapsed {
+                display: none;
+            }
+            
+            .toggle-metrics {
+                position: relative;
+                left: 0 !important;
+                margin: 10px;
+                border-radius: 8px;
+            }
+            
+            .container {
+                margin-left: 0 !important;
+                margin-right: 0;
+            }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🛡️ Threat Severity Model</h1>
-        <p class="subtitle">Real-time Network Traffic Threat Scoring & Risk Assessment</p>
-        
-        <!-- Real-time Metrics Panel -->
+    <!-- Toggle Button -->
+    <button class="toggle-metrics" id="toggleBtn" onclick="toggleSidebar()">☰</button>
+    
+    <!-- Metrics Sidebar -->
+    <div class="metrics-sidebar" id="metricsSidebar">
         <div class="metrics-panel">
-            <div class="metrics-header">📊 Real-time Monitoring Metrics</div>
+            <div class="metrics-header">📊 Real-time Monitoring</div>
             <div class="metrics-grid">
                 <div class="metric-card">
                     <div class="metric-label">Total Predictions</div>
@@ -324,7 +401,7 @@
                 </div>
                 <div class="dist-item">
                     <div class="dist-count" id="mediumCount" style="color: #fbbf24;">0</div>
-                    <div class="dist-label">Medium Risk</div>
+                    <div class="dist-label">Medium</div>
                 </div>
                 <div class="dist-item">
                     <div class="dist-count" id="highCount" style="color: #f87171;">0</div>
@@ -335,10 +412,14 @@
                     <div class="dist-label">Critical</div>
                 </div>
             </div>
-            <div style="text-align: center;">
-                <button class="btn-reset" onclick="resetMetrics()">🔄 Reset Metrics</button>
-            </div>
+            <button class="btn-reset" onclick="resetMetrics()">🔄 Reset Metrics</button>
         </div>
+    </div>
+    
+    <!-- Main Content -->
+    <div class="container" id="mainContainer">
+        <h1>🛡️ Threat Severity Model</h1>
+        <p class="subtitle">Real-time Network Traffic Threat Scoring & Risk Assessment</p>
         
         <div class="info-box">
             <strong>Instructions:</strong> Enter 41 NSL-KDD feature values as a JSON array, or click "Load Sample Data" to test with example traffic data.
@@ -652,6 +733,23 @@
             resultDiv.classList.add('show');
         }
         
+        // Toggle sidebar function
+        function toggleSidebar() {
+            const sidebar = document.getElementById('metricsSidebar');
+            const container = document.getElementById('mainContainer');
+            const toggleBtn = document.getElementById('toggleBtn');
+            
+            sidebar.classList.toggle('collapsed');
+            container.classList.toggle('sidebar-collapsed');
+            toggleBtn.classList.toggle('collapsed');
+            
+            // Update button icon
+            toggleBtn.textContent = sidebar.classList.contains('collapsed') ? '☰' : '✕';
+            
+            // Save state to localStorage
+            localStorage.setItem('sidebarCollapsed', sidebar.classList.contains('collapsed'));
+        }
+        
         // Allow Enter key in textarea to trigger prediction (Ctrl+Enter)
         document.getElementById('features').addEventListener('keydown', function(e) {
             if (e.ctrlKey && e.key === 'Enter') {
@@ -659,9 +757,15 @@
             }
         });
         
-        // Load metrics on page load
+        // Load metrics and sidebar state on page load
         window.addEventListener('DOMContentLoaded', function() {
             updateMetrics();
+            
+            // Restore sidebar state
+            const sidebarCollapsed = localStorage.getItem('sidebarCollapsed') === 'true';
+            if (sidebarCollapsed) {
+                toggleSidebar();
+            }
         });
     </script>
 </body>

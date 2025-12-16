@@ -260,10 +260,121 @@
         .metrics-header {
             font-size: 20px;
             font-weight: 600;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             text-align: center;
-            padding-bottom: 15px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .tab-navigation {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+            padding-bottom: 10px;
+        }
+        
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            border: none;
+            padding: 8px 12px;
+            border-radius: 6px 6px 0 0;
+            cursor: pointer;
+            font-size: 11px;
+            transition: all 0.3s;
+            flex: 1;
+            min-width: 80px;
+        }
+        
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+        }
+        
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.25);
+            color: white;
+            font-weight: 600;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .metric-table {
+            width: 100%;
+            margin-top: 10px;
+            font-size: 12px;
+        }
+        
+        .metric-table td {
+            padding: 8px 5px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .metric-table td:first-child {
+            opacity: 0.8;
+            font-size: 11px;
+        }
+        
+        .metric-table td:last-child {
+            text-align: right;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .confusion-matrix {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 5px;
+            margin-top: 10px;
+        }
+        
+        .confusion-cell {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-size: 11px;
+        }
+        
+        .confusion-cell .value {
+            font-size: 18px;
+            font-weight: bold;
+            display: block;
+            margin-top: 5px;
+        }
+        
+        .drift-indicator {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-size: 10px;
+            font-weight: 600;
+            margin-left: 5px;
+        }
+        
+        .drift-none { background: #4ade80; color: #064e3b; }
+        .drift-moderate { background: #fbbf24; color: #78350f; }
+        .drift-high { background: #f87171; color: #7f1d1d; }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 5px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4ade80, #22c55e);
+            transition: width 0.3s;
         }
         
         .metrics-grid {
@@ -375,44 +486,205 @@
     <!-- Metrics Sidebar -->
     <div class="metrics-sidebar" id="metricsSidebar">
         <div class="metrics-panel">
-            <div class="metrics-header">📊 Real-time Monitoring</div>
-            <div class="metrics-grid">
+            <div class="metrics-header">📊 Model Monitoring</div>
+            
+            <!-- Tab Navigation -->
+            <div class="tab-navigation">
+                <button class="tab-btn active" onclick="switchTab('realtime')">Real-time</button>
+                <button class="tab-btn" onclick="switchTab('performance')">Performance</button>
+                <button class="tab-btn" onclick="switchTab('training')">Training</button>
+                <button class="tab-btn" onclick="switchTab('datadrift')">Data Drift</button>
+                <button class="tab-btn" onclick="switchTab('modeldrift')">Model Drift</button>
+                <button class="tab-btn" onclick="switchTab('operational')">Operational</button>
+            </div>
+            
+            <!-- Real-time Tab -->
+            <div id="tab-realtime" class="tab-content active">
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-label">Total Predictions</div>
+                        <div class="metric-value" id="totalPredictions">0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Avg Response Time</div>
+                        <div class="metric-value" id="avgLatency">0<span class="metric-unit">ms</span></div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Avg Threat Score</div>
+                        <div class="metric-value" id="avgThreatScore">0.0</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-label">Error Rate</div>
+                        <div class="metric-value" id="errorRate">0<span class="metric-unit">%</span></div>
+                    </div>
+                </div>
+                <div class="threat-distribution">
+                    <div class="dist-item">
+                        <div class="dist-count" id="lowCount" style="color: #4ade80;">0</div>
+                        <div class="dist-label">Low Risk</div>
+                    </div>
+                    <div class="dist-item">
+                        <div class="dist-count" id="mediumCount" style="color: #fbbf24;">0</div>
+                        <div class="dist-label">Medium</div>
+                    </div>
+                    <div class="dist-item">
+                        <div class="dist-count" id="highCount" style="color: #f87171;">0</div>
+                        <div class="dist-label">High Risk</div>
+                    </div>
+                    <div class="dist-item">
+                        <div class="dist-count" id="criticalCount" style="color: #dc2626;">0</div>
+                        <div class="dist-label">Critical</div>
+                    </div>
+                </div>
+                <button class="btn-reset" onclick="resetMetrics()">🔄 Reset Metrics</button>
+            </div>
+            
+            <!-- Performance Metrics Tab -->
+            <div id="tab-performance" class="tab-content">
                 <div class="metric-card">
-                    <div class="metric-label">Total Predictions</div>
-                    <div class="metric-value" id="totalPredictions">0</div>
+                    <div class="metric-label">Model Performance (Mockup)</div>
+                    <table class="metric-table">
+                        <tr><td>Accuracy</td><td>94.7%</td></tr>
+                        <tr><td>Precision</td><td>92.3%</td></tr>
+                        <tr><td>Recall</td><td>95.8%</td></tr>
+                        <tr><td>F1-Score</td><td>94.0%</td></tr>
+                        <tr><td>AUC-ROC</td><td>0.968</td></tr>
+                    </table>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-label">Avg Response Time</div>
-                    <div class="metric-value" id="avgLatency">0<span class="metric-unit">ms</span></div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Avg Threat Score</div>
-                    <div class="metric-value" id="avgThreatScore">0.0</div>
-                </div>
-                <div class="metric-card">
-                    <div class="metric-label">Error Rate</div>
-                    <div class="metric-value" id="errorRate">0<span class="metric-unit">%</span></div>
+                    <div class="metric-label">Confusion Matrix</div>
+                    <div class="confusion-matrix">
+                        <div class="confusion-cell"><small>TN</small><span class="value">4521</span></div>
+                        <div class="confusion-cell"><small>FP</small><span class="value">187</span></div>
+                        <div class="confusion-cell"></div>
+                        <div class="confusion-cell"><small>FN</small><span class="value">95</span></div>
+                        <div class="confusion-cell"><small>TP</small><span class="value">2197</span></div>
+                        <div class="confusion-cell"></div>
+                    </div>
                 </div>
             </div>
-            <div class="threat-distribution">
-                <div class="dist-item">
-                    <div class="dist-count" id="lowCount" style="color: #4ade80;">0</div>
-                    <div class="dist-label">Low Risk</div>
+            
+            <!-- Training Metrics Tab -->
+            <div id="tab-training" class="tab-content">
+                <div class="metric-card">
+                    <div class="metric-label">Training Metrics</div>
+                    <table class="metric-table">
+                        <tr><td>Training Accuracy</td><td>96.2%</td></tr>
+                        <tr><td>Training Loss</td><td>0.0834</td></tr>
+                        <tr><td>Training Time</td><td>12m 34s</td></tr>
+                        <tr><td>Epochs</td><td>100</td></tr>
+                    </table>
                 </div>
-                <div class="dist-item">
-                    <div class="dist-count" id="mediumCount" style="color: #fbbf24;">0</div>
-                    <div class="dist-label">Medium</div>
+                <div class="metric-card">
+                    <div class="metric-label">Validation Metrics</div>
+                    <table class="metric-table">
+                        <tr><td>Val Accuracy</td><td>94.7%</td></tr>
+                        <tr><td>Val Loss</td><td>0.1156</td></tr>
+                        <tr><td>Val Precision</td><td>92.3%</td></tr>
+                        <tr><td>Val Recall</td><td>95.8%</td></tr>
+                    </table>
                 </div>
-                <div class="dist-item">
-                    <div class="dist-count" id="highCount" style="color: #f87171;">0</div>
-                    <div class="dist-label">High Risk</div>
-                </div>
-                <div class="dist-item">
-                    <div class="dist-count" id="criticalCount" style="color: #dc2626;">0</div>
-                    <div class="dist-label">Critical</div>
+                <div class="metric-card">
+                    <div class="metric-label">Model Info</div>
+                    <table class="metric-table">
+                        <tr><td>Algorithm</td><td>XGBoost</td></tr>
+                        <tr><td>Features</td><td>41 → 49</td></tr>
+                        <tr><td>Dataset</td><td>NSL-KDD</td></tr>
+                        <tr><td>Samples</td><td>125,973</td></tr>
+                    </table>
                 </div>
             </div>
-            <button class="btn-reset" onclick="resetMetrics()">🔄 Reset Metrics</button>
+            
+            <!-- Data Drift Tab -->
+            <div id="tab-datadrift" class="tab-content">
+                <div class="metric-card">
+                    <div class="metric-label">Population Stability Index</div>
+                    <table class="metric-table">
+                        <tr><td>Overall PSI</td><td>0.08<span class="drift-indicator drift-none">No Drift</span></td></tr>
+                        <tr><td>Duration</td><td>0.05<span class="drift-indicator drift-none">✓</span></td></tr>
+                        <tr><td>Protocol Type</td><td>0.12<span class="drift-indicator drift-moderate">⚠</span></td></tr>
+                        <tr><td>Src Bytes</td><td>0.24<span class="drift-indicator drift-high">!</span></td></tr>
+                    </table>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">KS Test Results</div>
+                    <table class="metric-table">
+                        <tr><td>Failed Tests</td><td>3 / 41</td></tr>
+                        <tr><td>Avg P-value</td><td>0.127</td></tr>
+                        <tr><td>Max KS Stat</td><td>0.183</td></tr>
+                    </table>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Feature Statistics</div>
+                    <table class="metric-table">
+                        <tr><td>Mean Shift</td><td>+8.3%</td></tr>
+                        <tr><td>Std Shift</td><td>+12.1%</td></tr>
+                        <tr><td>JS Divergence</td><td>0.046</td></tr>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Model Drift Tab -->
+            <div id="tab-modeldrift" class="tab-content">
+                <div class="metric-card">
+                    <div class="metric-label">Performance Degradation</div>
+                    <table class="metric-table">
+                        <tr><td>Baseline Accuracy</td><td>94.7%</td></tr>
+                        <tr><td>Current Accuracy</td><td>93.1%</td></tr>
+                        <tr><td>Degradation</td><td>-1.6%<span class="drift-indicator drift-moderate">⚠</span></td></tr>
+                    </table>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 93.1%; background: linear-gradient(90deg, #fbbf24, #f59e0b);"></div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Error Rate Trends</div>
+                    <table class="metric-table">
+                        <tr><td>False Positives</td><td>+15%</td></tr>
+                        <tr><td>False Negatives</td><td>+8%</td></tr>
+                        <tr><td>Overall Error</td><td>+11%</td></tr>
+                    </table>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Calibration & Importance</div>
+                    <table class="metric-table">
+                        <tr><td>Calibration Error</td><td>0.047</td></tr>
+                        <tr><td>SHAP Shift</td><td>12.3%</td></tr>
+                        <tr><td>Top Feature Stable</td><td>Yes</td></tr>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Operational Tab -->
+            <div id="tab-operational" class="tab-content">
+                <div class="metric-card">
+                    <div class="metric-label">Latency (ms)</div>
+                    <table class="metric-table">
+                        <tr><td>P50 (Median)</td><td>45 ms</td></tr>
+                        <tr><td>P95</td><td>127 ms</td></tr>
+                        <tr><td>P99</td><td>203 ms</td></tr>
+                    </table>
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: 78%;"></div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Throughput & Errors</div>
+                    <table class="metric-table">
+                        <tr><td>Requests/sec</td><td>23.4</td></tr>
+                        <tr><td>Total Requests</td><td>1.2M</td></tr>
+                        <tr><td>Failed Requests</td><td>0.3%</td></tr>
+                    </table>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Resource Usage</div>
+                    <table class="metric-table">
+                        <tr><td>CPU Usage</td><td>34%</td></tr>
+                        <tr><td>Memory</td><td>1.2 / 2.0 GB</td></tr>
+                        <tr><td>Container Uptime</td><td>3d 14h</td></tr>
+                    </table>
+                </div>
+            </div>
         </div>
     </div>
     
@@ -519,6 +791,24 @@
                 metrics.riskCounts = { low: 0, medium: 0, high: 0, critical: 0 };
                 updateMetrics();
             }
+        }
+        
+        function switchTab(tabName) {
+            // Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Remove active class from all buttons
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            
+            // Show selected tab
+            document.getElementById(`tab-${tabName}`).classList.add('active');
+            
+            // Highlight active button
+            event.target.classList.add('active');
         }
         
         function getRiskCategory(score) {

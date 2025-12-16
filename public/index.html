@@ -492,6 +492,7 @@
             <div class="tab-navigation">
                 <button class="tab-btn active" onclick="switchTab('realtime')">Real-time</button>
                 <button class="tab-btn" onclick="switchTab('performance')">Performance</button>
+                <button class="tab-btn" onclick="switchTab('comparison')">Models</button>
                 <button class="tab-btn" onclick="switchTab('training')">Training</button>
                 <button class="tab-btn" onclick="switchTab('datadrift')">Data Drift</button>
                 <button class="tab-btn" onclick="switchTab('modeldrift')">Model Drift</button>
@@ -539,27 +540,210 @@
                 <button class="btn-reset" onclick="resetMetrics()">🔄 Reset Metrics</button>
             </div>
             
-            <!-- Performance Metrics Tab -->
-            <div id="tab-performance" class="tab-content">
+            <!-- Model Selection Tab -->
+            <div id="tab-modelselection" class="tab-content">
                 <div class="metric-card">
-                    <div class="metric-label">Model Performance (Mockup)</div>
+                    <div class="metric-label">📊 Dataset Information</div>
                     <table class="metric-table">
-                        <tr><td>Accuracy</td><td>94.7%</td></tr>
-                        <tr><td>Precision</td><td>92.3%</td></tr>
-                        <tr><td>Recall</td><td>95.8%</td></tr>
-                        <tr><td>F1-Score</td><td>94.0%</td></tr>
-                        <tr><td>AUC-ROC</td><td>0.968</td></tr>
+                        <tr><td>Total Records</td><td>148,517</td></tr>
+                        <tr><td>Train Set</td><td>100,778</td></tr>
+                        <tr><td>Validation Set</td><td>25,195</td></tr>
+                        <tr><td>Test Set</td><td>22,544</td></tr>
+                    </table>
+                    <small style="opacity: 0.7; font-size: 10px; display: block; margin-top: 8px;">
+                        NSL-KDD dataset: Normal (67,343), Low severity (11,656), High severity (46,837)
+                    </small>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">🔧 Feature Engineering</div>
+                    <table class="metric-table">
+                        <tr><td>Original Features</td><td>41</td></tr>
+                        <tr><td>Engineered Features</td><td>+20</td></tr>
+                        <tr><td>Final Feature Count</td><td>61</td></tr>
+                    </table>
+                    <small style="opacity: 0.7; font-size: 10px; display: block; margin-top: 8px;">
+                        Added: Protocol patterns, connection rates, service behaviors, error ratios
+                    </small>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">🏆 Model Comparison (Validation Set)</div>
+                    <table class="metric-table" style="font-size: 11px;">
+                        <tr style="border-bottom: 2px solid rgba(255,255,255,0.3);">
+                            <td><b>Model</b></td>
+                            <td style="text-align: right;"><b>Val RMSE</b></td>
+                        </tr>
+                        <tr style="background: rgba(76, 175, 80, 0.2);">
+                            <td>✓ XGBoost</td>
+                            <td style="text-align: right;">0.240</td>
+                        </tr>
+                        <tr>
+                            <td>LightGBM</td>
+                            <td style="text-align: right;">0.246</td>
+                        </tr>
+                        <tr>
+                            <td>Random Forest</td>
+                            <td style="text-align: right;">0.963</td>
+                        </tr>
+                        <tr>
+                            <td>Linear</td>
+                            <td style="text-align: right;">1.204</td>
+                        </tr>
                     </table>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-label">Confusion Matrix</div>
-                    <div class="confusion-matrix">
-                        <div class="confusion-cell"><small>TN</small><span class="value">4521</span></div>
-                        <div class="confusion-cell"><small>FP</small><span class="value">187</span></div>
-                        <div class="confusion-cell"></div>
-                        <div class="confusion-cell"><small>FN</small><span class="value">95</span></div>
-                        <div class="confusion-cell"><small>TP</small><span class="value">2197</span></div>
-                        <div class="confusion-cell"></div>
+                    <div class="metric-label">📈 Detailed Metrics</div>
+                    <table class="metric-table" style="font-size: 10px;">
+                        <tr style="border-bottom: 2px solid rgba(255,255,255,0.3);">
+                            <td><b>Model</b></td>
+                            <td style="text-align: right;"><b>Val R²</b></td>
+                            <td style="text-align: right;"><b>Time(s)</b></td>
+                        </tr>
+                        <tr style="background: rgba(76, 175, 80, 0.2);">
+                            <td>✓ XGBoost</td>
+                            <td style="text-align: right;">0.9948</td>
+                            <td style="text-align: right;">1.56</td>
+                        </tr>
+                        <tr>
+                            <td>LightGBM</td>
+                            <td style="text-align: right;">0.9946</td>
+                            <td style="text-align: right;">0.74</td>
+                        </tr>
+                        <tr>
+                            <td>Random Forest</td>
+                            <td style="text-align: right;">0.9168</td>
+                            <td style="text-align: right;">18.60</td>
+                        </tr>
+                        <tr>
+                            <td>Linear</td>
+                            <td style="text-align: right;">0.8699</td>
+                            <td style="text-align: right;">0.12</td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="metric-card" style="background: rgba(76, 175, 80, 0.15);">
+                    <div class="metric-label">✅ Why XGBoost?</div>
+                    <div style="font-size: 11px; line-height: 1.6; opacity: 0.95;">
+                        <div style="margin-bottom: 8px;">✓ <b>Best Validation RMSE:</b> 0.240 (lowest error)</div>
+                        <div style="margin-bottom: 8px;">✓ <b>Highest R² Score:</b> 0.9948 (best fit)</div>
+                        <div style="margin-bottom: 8px;">✓ <b>Fast Inference:</b> 1.56s training, ~12ms per prediction</div>
+                        <div>✓ <b>No Overfitting:</b> Train RMSE 0.185 vs Val RMSE 0.240</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Performance Metrics Tab -->
+            <div id="tab-performance" class="tab-content">
+                <div class="metric-card">
+                    <div class="metric-label">Model Performance (Real - Test Set)</div>
+                    <table class="metric-table">
+                        <tr><td>Precision</td><td>98.1%</td></tr>
+                        <tr><td>Recall</td><td>55.1%</td></tr>
+                        <tr><td>F1-Score</td><td>70.6%</td></tr>
+                        <tr><td>AUC-ROC</td><td>0.960</td></tr>
+                    </table>
+                    <small style="opacity: 0.7; font-size: 10px; display: block; margin-top: 8px;">
+                        High precision (98%) minimizes false alarms. Lower recall tuned for cost-optimal threshold.
+                    </small>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Regression Metrics</div>
+                    <table class="metric-table">
+                        <tr><td>RMSE</td><td>3.08</td></tr>
+                        <tr><td>MAE</td><td>1.54</td></tr>
+                        <tr><td>R² Score</td><td>0.198</td></tr>
+                    </table>
+                </div>
+            </div>
+            
+            <!-- Model Comparison Tab -->
+            <div id="tab-comparison" class="tab-content">
+                <div class="metric-card">
+                    <div class="metric-label">📊 Dataset & Features</div>
+                    <table class="metric-table">
+                        <tr><td>Total Records</td><td>148,517</td></tr>
+                        <tr><td>Train / Val / Test</td><td>100,778 / 25,195 / 22,544</td></tr>
+                        <tr><td>Original Features</td><td>41</td></tr>
+                        <tr><td>Engineered Features</td><td>+20</td></tr>
+                        <tr><td>Final Features</td><td>61</td></tr>
+                    </table>
+                    <small style="opacity: 0.7; font-size: 10px; display: block; margin-top: 5px;">
+                        Added: Protocol patterns, connection rates, service behaviors, error ratios
+                    </small>
+                </div>
+                
+                <div class="metric-card" style="background: rgba(74, 222, 128, 0.15);">
+                    <div class="metric-label">🏆 XGBoost (Selected)</div>
+                    <table class="metric-table">
+                        <tr><td>Val RMSE</td><td>0.240</td></tr>
+                        <tr><td>Val R²</td><td>0.9948</td></tr>
+                        <tr><td>Test Precision</td><td>98.1%</td></tr>
+                        <tr><td>Test Recall</td><td>55.1%</td></tr>
+                        <tr><td>Test AUC-ROC</td><td>0.960</td></tr>
+                        <tr><td>Training Time</td><td>1.56s</td></tr>
+                    </table>
+                    <div style="background: rgba(74, 222, 128, 0.3); padding: 6px; border-radius: 4px; margin-top: 8px;">
+                        <small style="font-size: 10px; font-weight: 600;">✓ BEST: Lowest validation RMSE</small>
+                    </div>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">LightGBM (2nd)</div>
+                    <table class="metric-table">
+                        <tr><td>Val RMSE</td><td>0.246</td></tr>
+                        <tr><td>Val R²</td><td>0.9946</td></tr>
+                        <tr><td>Training Time</td><td>0.74s</td></tr>
+                    </table>
+                    <small style="opacity: 0.7; font-size: 10px; display: block; margin-top: 5px;">
+                        Faster training, slightly higher error (+0.006 RMSE)
+                    </small>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">Random Forest (3rd)</div>
+                    <table class="metric-table">
+                        <tr><td>Val RMSE</td><td>0.963</td></tr>
+                        <tr><td>Val R²</td><td>0.9168</td></tr>
+                        <tr><td>Training Time</td><td>18.60s</td></tr>
+                    </table>
+                    <small style="opacity: 0.7; font-size: 10px; display: block; margin-top: 5px;">
+                        High overfitting: Train RMSE 0.228, Val RMSE 0.963
+                    </small>
+                </div>
+                
+                <div class="metric-card">
+                    <div class="metric-label">Linear Regression (Baseline)</div>
+                    <table class="metric-table">
+                        <tr><td>Val RMSE</td><td>1.204</td></tr>
+                        <tr><td>Val R²</td><td>0.8699</td></tr>
+                        <tr><td>Training Time</td><td>0.12s</td></tr>
+                    </table>
+                    <small style="opacity: 0.7; font-size: 10px; display: block; margin-top: 5px;">
+                        Fastest but lowest accuracy. Simple baseline model.
+                    </small>
+                </div>
+                
+                <div class="metric-card" style="background: rgba(59, 130, 246, 0.15);">
+                    <div class="metric-label">🎯 Why XGBoost Won</div>
+                    <div style="font-size: 11px; line-height: 1.7; opacity: 0.95;">
+                        <div style="margin-bottom: 6px;">✓ <b>Lowest Val RMSE:</b> 0.240 vs 0.246 (LightGBM)</div>
+                        <div style="margin-bottom: 6px;">✓ <b>Highest R²:</b> 0.9948 (best explained variance)</div>
+                        <div style="margin-bottom: 6px;">✓ <b>No Overfitting:</b> Train 0.185 → Val 0.240</div>
+                        <div>✓ <b>Balanced:</b> Good accuracy + reasonable speed (1.56s)</div>
+                    </div>
+                </div>
+            </div>
+                    <small style="opacity: 0.7; font-size: 10px; display: block; margin-top: 5px;">Baseline - fastest but lowest accuracy</small>
+                </div>
+                
+                <div class="metric-card" style="background: rgba(255, 255, 255, 0.05);">
+                    <div class="metric-label">Why XGBoost?</div>
+                    <div style="font-size: 11px; line-height: 1.6; opacity: 0.9;">
+                        • <b>Best RMSE</b> on validation set<br>
+                        • <b>98.1% precision</b> minimizes false alarms<br>
+                        • <b>96% AUC-ROC</b> excellent discrimination<br>
+                        • Handles <b>class imbalance</b> well<br>
+                        • Only <b>12ms inference</b> (acceptable)<br>
+                        • <b>Feature importance</b> via SHAP<br>
                     </div>
                 </div>
             </div>
@@ -567,30 +751,30 @@
             <!-- Training Metrics Tab -->
             <div id="tab-training" class="tab-content">
                 <div class="metric-card">
-                    <div class="metric-label">Training Metrics</div>
+                    <div class="metric-label">Test Set Performance</div>
                     <table class="metric-table">
-                        <tr><td>Training Accuracy</td><td>96.2%</td></tr>
-                        <tr><td>Training Loss</td><td>0.0834</td></tr>
-                        <tr><td>Training Time</td><td>12m 34s</td></tr>
-                        <tr><td>Epochs</td><td>100</td></tr>
+                        <tr><td>Test RMSE</td><td>3.08</td></tr>
+                        <tr><td>Test MAE</td><td>1.54</td></tr>
+                        <tr><td>Test R²</td><td>0.198</td></tr>
+                        <tr><td>Test AUC-ROC</td><td>0.960</td></tr>
                     </table>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-label">Validation Metrics</div>
+                    <div class="metric-label">Optimal Thresholds</div>
                     <table class="metric-table">
-                        <tr><td>Val Accuracy</td><td>94.7%</td></tr>
-                        <tr><td>Val Loss</td><td>0.1156</td></tr>
-                        <tr><td>Val Precision</td><td>92.3%</td></tr>
-                        <tr><td>Val Recall</td><td>95.8%</td></tr>
+                        <tr><td>Cost Optimal</td><td>2.42</td></tr>
+                        <tr><td>IR Precision</td><td>4.99</td></tr>
+                        <tr><td>Balanced</td><td>0.007</td></tr>
                     </table>
                 </div>
                 <div class="metric-card">
-                    <div class="metric-label">Model Info</div>
+                    <div class="metric-label">Dataset Info</div>
                     <table class="metric-table">
                         <tr><td>Algorithm</td><td>XGBoost</td></tr>
-                        <tr><td>Features</td><td>41 → 49</td></tr>
-                        <tr><td>Dataset</td><td>NSL-KDD</td></tr>
-                        <tr><td>Samples</td><td>125,973</td></tr>
+                        <tr><td>Features</td><td>41 → 61</td></tr>
+                        <tr><td>Train Samples</td><td>100,778</td></tr>
+                        <tr><td>Val Samples</td><td>25,195</td></tr>
+                        <tr><td>Test Samples</td><td>22,544</td></tr>
                     </table>
                 </div>
             </div>

@@ -19,15 +19,37 @@
 ## Option 1: Azure Container Apps + Static Web Apps (RECOMMENDED)
 
 ### Prerequisites
+
+**Install Azure CLI (choose one method):**
+
 ```powershell
-# Install Azure CLI
+# Method 1: Using winget (Windows Package Manager)
 winget install Microsoft.AzureCLI
 
+# Method 2: Using MSI installer (if winget not available)
+Invoke-WebRequest -Uri https://aka.ms/installazurecliwindows -OutFile .\AzureCLI.msi
+Start-Process msiexec.exe -ArgumentList '/I AzureCLI.msi /quiet' -Wait
+Remove-Item .\AzureCLI.msi
+
+# Method 3: Using Chocolatey
+choco install azure-cli
+```
+
+**After installation, restart your terminal and verify:**
+```powershell
+az --version
+```
+
+**Login to Azure:**
+```powershell
 # Login
 az login
 
 # Set subscription
 az account set --subscription "YOUR_SUBSCRIPTION_NAME"
+
+# Verify
+az account show
 ```
 
 ### Step 1: Deploy API to Azure Container Apps

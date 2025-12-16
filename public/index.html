@@ -205,12 +205,120 @@
             font-size: 14px;
             color: #004085;
         }
+        
+        .metrics-panel {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 25px;
+            color: white;
+        }
+        
+        .metrics-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .metric-card {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            backdrop-filter: blur(10px);
+        }
+        
+        .metric-label {
+            font-size: 12px;
+            opacity: 0.9;
+            margin-bottom: 5px;
+        }
+        
+        .metric-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        
+        .metric-unit {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        
+        .threat-distribution {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .dist-item {
+            text-align: center;
+        }
+        
+        .dist-count {
+            font-size: 20px;
+            font-weight: bold;
+        }
+        
+        .dist-label {
+            font-size: 11px;
+            opacity: 0.9;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🛡️ Threat Severity Model</h1>
         <p class="subtitle">Real-time Network Traffic Threat Scoring & Risk Assessment</p>
+        
+        <!-- Real-time Metrics Panel -->
+        <div class="metrics-panel">
+            <div class="metrics-header">📊 Real-time Monitoring Metrics</div>
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-label">Total Predictions</div>
+                    <div class="metric-value" id="totalPredictions">0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Avg Response Time</div>
+                    <div class="metric-value" id="avgLatency">0<span class="metric-unit">ms</span></div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Avg Threat Score</div>
+                    <div class="metric-value" id="avgThreatScore">0.0</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Error Rate</div>
+                    <div class="metric-value" id="errorRate">0<span class="metric-unit">%</span></div>
+                </div>
+            </div>
+            <div class="threat-distribution">
+                <div class="dist-item">
+                    <div class="dist-count" id="lowCount" style="color: #4ade80;">0</div>
+                    <div class="dist-label">Low Risk</div>
+                </div>
+                <div class="dist-item">
+                    <div class="dist-count" id="mediumCount" style="color: #fbbf24;">0</div>
+                    <div class="dist-label">Medium Risk</div>
+                </div>
+                <div class="dist-item">
+                    <div class="dist-count" id="highCount" style="color: #f87171;">0</div>
+                    <div class="dist-label">High Risk</div>
+                </div>
+                <div class="dist-item">
+                    <div class="dist-count" id="criticalCount" style="color: #dc2626;">0</div>
+                    <div class="dist-label">Critical</div>
+                </div>
+            </div>
+        </div>
         
         <div class="info-box">
             <strong>Instructions:</strong> Enter 41 NSL-KDD feature values as a JSON array, or click "Load Sample Data" to test with example traffic data.
@@ -248,6 +356,50 @@
         const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
             ? 'http://127.0.0.1:5000'
             : 'https://threat-model-api.mangoriver-796b80ca.centralus.azurecontainerapps.io';
+        
+        // Metrics tracking
+        const metrics = {
+            totalPredictions: 0,
+            totalErrors: 0,
+            latencies: [],
+            threatScores: [],
+            riskCounts: { low: 0, medium: 0, high: 0, critical: 0 }
+        };
+        
+        function updateMetrics() {
+            document.getElementById('totalPredictions').textContent = metrics.totalPredictions;
+            
+            // Calculate average latency
+            const avgLatency = metrics.latencies.length > 0 
+                ? Math.round(metrics.latencies.reduce((a, b) => a + b, 0) / metrics.latencies.length)
+                : 0;
+            document.getElementById('avgLatency').innerHTML = `${avgLatency}<span class="metric-unit">ms</span>`;
+            
+            // Calculate average threat score
+            const avgScore = metrics.threatScores.length > 0
+                ? (metrics.threatScores.reduce((a, b) => a + b, 0) / metrics.threatScores.length).toFixed(2)
+                : '0.0';
+            document.getElementById('avgThreatScore').textContent = avgScore;
+            
+            // Calculate error rate
+            const errorRate = metrics.totalPredictions > 0
+                ? ((metrics.totalErrors / metrics.totalPredictions) * 100).toFixed(1)
+                : '0';
+            document.getElementById('errorRate').innerHTML = `${errorRate}<span class="metric-unit">%</span>`;
+            
+            // Update risk distribution
+            document.getElementById('lowCount').textContent = metrics.riskCounts.low;
+            document.getElementById('mediumCount').textContent = metrics.riskCounts.medium;
+            document.getElementById('highCount').textContent = metrics.riskCounts.high;
+            document.getElementById('criticalCount').textContent = metrics.riskCounts.critical;
+        }
+        
+        function getRiskCategory(score) {
+            if (score < 3) return 'low';
+            if (score < 5) return 'medium';
+            if (score < 7) return 'high';
+            return 'critical';
+        }
         
         function loadSampleData() {
             // Normal traffic pattern - low threat
@@ -344,6 +496,8 @@
             loadingDiv.style.display = 'block';
             resultDiv.classList.remove('show');
             
+            const startTime = performance.now();
+            
             try {
                 const response = await fetch(`${API_URL}/predict`, {
                     method: 'POST',
@@ -356,14 +510,32 @@
                     })
                 });
                 
+                const endTime = performance.now();
+                const latency = Math.round(endTime - startTime);
+                
                 const data = await response.json();
                 
                 if (!response.ok) {
                     throw new Error(data.message || 'Prediction failed');
                 }
                 
+                // Update metrics
+                metrics.totalPredictions++;
+                metrics.latencies.push(latency);
+                metrics.threatScores.push(data.threat_score);
+                const riskCategory = getRiskCategory(data.threat_score);
+                metrics.riskCounts[riskCategory]++;
+                
+                // Keep only last 100 latencies/scores for rolling average
+                if (metrics.latencies.length > 100) metrics.latencies.shift();
+                if (metrics.threatScores.length > 100) metrics.threatScores.shift();
+                
+                updateMetrics();
                 displayResult(data);
             } catch (error) {
+                metrics.totalPredictions++;
+                metrics.totalErrors++;
+                updateMetrics();
                 showError(`Error: ${error.message}`);
             } finally {
                 loadingDiv.style.display = 'none';

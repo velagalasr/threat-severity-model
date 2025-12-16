@@ -1,0 +1,445 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Threat Severity Model - Web UI</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 30px;
+        }
+        
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            text-align: center;
+        }
+        
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 30px;
+        }
+        
+        .input-section {
+            margin-bottom: 25px;
+        }
+        
+        label {
+            display: block;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+        }
+        
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            resize: vertical;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+        
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .btn-predict {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-predict:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn-sample {
+            background: #f0f0f0;
+            color: #333;
+        }
+        
+        .btn-sample:hover {
+            background: #e0e0e0;
+        }
+        
+        .checkbox-section {
+            margin-bottom: 20px;
+        }
+        
+        .checkbox-section label {
+            display: flex;
+            align-items: center;
+            font-weight: normal;
+        }
+        
+        .checkbox-section input[type="checkbox"] {
+            margin-right: 8px;
+            width: 18px;
+            height: 18px;
+        }
+        
+        .result-section {
+            display: none;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+        
+        .result-section.show {
+            display: block;
+        }
+        
+        .result-section.error {
+            border-left-color: #e74c3c;
+            background: #fee;
+        }
+        
+        .result-header {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .result-item {
+            margin-bottom: 12px;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        
+        .result-label {
+            font-weight: 600;
+            color: #555;
+            margin-right: 10px;
+        }
+        
+        .threat-score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .risk-badge {
+            display: inline-block;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+        
+        .risk-low { background: #d4edda; color: #155724; }
+        .risk-medium { background: #fff3cd; color: #856404; }
+        .risk-high { background: #f8d7da; color: #721c24; }
+        .risk-critical { background: #f5c6cb; color: #491217; }
+        
+        .contributors {
+            margin-top: 15px;
+        }
+        
+        .contributor-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            margin: 5px 0;
+            background: white;
+            border-radius: 5px;
+            border-left: 3px solid #667eea;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #667eea;
+            font-weight: 600;
+        }
+        
+        .info-box {
+            background: #e7f3ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #004085;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🛡️ Threat Severity Model</h1>
+        <p class="subtitle">Real-time Network Traffic Threat Scoring & Risk Assessment</p>
+        
+        <div class="info-box">
+            <strong>Instructions:</strong> Enter 41 NSL-KDD feature values as a JSON array, or click "Load Sample Data" to test with example traffic data.
+        </div>
+        
+        <div class="input-section">
+            <label for="features">Network Traffic Features (41 values):</label>
+            <textarea id="features" placeholder='[0.0, 1.0, 0.5, 0.3, 100.0, 50.0, ...]'></textarea>
+        </div>
+        
+        <div class="checkbox-section">
+            <label>
+                <input type="checkbox" id="includeExplanation" checked>
+                Include SHAP Explanation (show top contributing features)
+            </label>
+        </div>
+        
+        <div class="button-group">
+            <button class="btn-sample" onclick="loadSampleData()">📋 Normal Traffic</button>
+            <button class="btn-sample" onclick="loadThreatData()" style="background: #ffe0e0; color: #c00;">⚠️ Threat Example</button>
+            <button class="btn-predict" onclick="predictThreat()">🚀 Predict Threat Severity</button>
+        </div>
+        
+        <div id="loading" class="loading" style="display: none;">
+            ⏳ Analyzing traffic and calculating threat score...
+        </div>
+        
+        <div id="result" class="result-section"></div>
+    </div>
+
+    <script>
+        // Configuration: Update this URL when deploying to Azure
+        // Local: 'http://127.0.0.1:5000'
+        // Azure: 'https://YOUR-API-NAME.azurecontainerapps.io'
+        const API_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+            ? 'http://127.0.0.1:5000'
+            : 'https://threat-model-api.mangoriver-796b80ca.centralus.azurecontainerapps.io';
+        
+        function loadSampleData() {
+            // Normal traffic pattern - low threat
+            const sampleFeatures = [
+                0.0, 1.0, 0.5, 0.3, 100.0, 50.0, 0.0, 0.0, 0.0, 0.0,
+                0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.5,
+                0.5, 0.0, 0.0, 1.0, 1.0, 0.0, 0.0, 10.0, 5.0, 0.1,
+                0.05, 0.1, 0.05, 1.0, 0.5, 0.01, 0.02, 1.0, 0.5, 0.1,
+                0.0
+            ];
+            document.getElementById('features').value = JSON.stringify(sampleFeatures, null, 2);
+        }
+        
+        function loadThreatData() {
+            // Suspicious traffic pattern - high threat indicators:
+            // - Multiple failed logins (num_failed_logins: 5)
+            // - Root shell access attempt (root_shell: 1)
+            // - High number of connections (count: 500)
+            // - Multiple compromised hosts (num_compromised: 3)
+            // - Port scanning behavior (dst_host_srv_count: 255)
+            const threatFeatures = [
+                0.0,      // duration
+                2.0,      // protocol_type (suspicious protocol)
+                5.0,      // service
+                1.0,      // flag (error flag)
+                5000.0,   // src_bytes (large data transfer)
+                0.0,      // dst_bytes (one-way traffic - suspicious)
+                1.0,      // land (same src/dst - attack indicator)
+                0.0,      // wrong_fragment
+                0.0,      // urgent
+                1.0,      // hot (accessing system files)
+                5.0,      // num_failed_logins (brute force indicator)
+                1.0,      // logged_in
+                3.0,      // num_compromised (compromised accounts)
+                1.0,      // root_shell (privilege escalation!)
+                1.0,      // su_attempted (privilege escalation attempt)
+                2.0,      // num_root (root accesses)
+                1.0,      // num_file_creations
+                1.0,      // num_shells (shell access)
+                1.0,      // num_access_files
+                0.0,      // num_outbound_cmds
+                0.0,      // is_hot_login
+                0.0,      // is_guest_login
+                500.0,    // count (high connection count)
+                255.0,    // srv_count (port scanning)
+                0.9,      // serror_rate (high error rate)
+                0.0,      // srv_serror_rate
+                0.0,      // rerror_rate
+                0.0,      // srv_rerror_rate
+                0.95,     // same_srv_rate
+                0.0,      // diff_srv_rate
+                0.1,      // srv_diff_host_rate
+                255.0,    // dst_host_count (scanning multiple hosts)
+                200.0,    // dst_host_srv_count
+                0.8,      // dst_host_same_srv_rate
+                0.2,      // dst_host_diff_srv_rate
+                0.0,      // dst_host_same_src_port_rate
+                0.9,      // dst_host_srv_diff_host_rate
+                0.7,      // dst_host_serror_rate
+                0.0,      // dst_host_srv_serror_rate
+                0.1,      // dst_host_rerror_rate
+                0.0       // dst_host_srv_rerror_rate
+            ];
+            document.getElementById('features').value = JSON.stringify(threatFeatures, null, 2);
+        }
+        
+        async function predictThreat() {
+            const featuresInput = document.getElementById('features').value.trim();
+            const includeExplanation = document.getElementById('includeExplanation').checked;
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            
+            // Validate input
+            if (!featuresInput) {
+                showError('Please enter feature values or load sample data.');
+                return;
+            }
+            
+            let features;
+            try {
+                features = JSON.parse(featuresInput);
+                if (!Array.isArray(features)) {
+                    throw new Error('Features must be an array');
+                }
+                if (features.length !== 41) {
+                    throw new Error(`Expected 41 features, got ${features.length}`);
+                }
+            } catch (e) {
+                showError(`Invalid JSON input: ${e.message}`);
+                return;
+            }
+            
+            // Show loading
+            loadingDiv.style.display = 'block';
+            resultDiv.classList.remove('show');
+            
+            try {
+                const response = await fetch(`${API_URL}/predict`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        features: features,
+                        include_explanation: includeExplanation
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.message || 'Prediction failed');
+                }
+                
+                displayResult(data);
+            } catch (error) {
+                showError(`Error: ${error.message}`);
+            } finally {
+                loadingDiv.style.display = 'none';
+            }
+        }
+        
+        function displayResult(data) {
+            const resultDiv = document.getElementById('result');
+            const riskClass = `risk-${data.risk_level}`;
+            
+            let html = `
+                <div class="result-header">✅ Prediction Results</div>
+                
+                <div class="result-item">
+                    <span class="result-label">Threat Severity Score:</span>
+                    <span class="threat-score">${data.threat_score.toFixed(2)} / 10</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Risk Level:</span>
+                    <span class="risk-badge ${riskClass}">${data.risk_level.toUpperCase()}</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Recommended Action:</span>
+                    <span>${data.recommended_action}</span>
+                </div>
+                
+                <div class="result-item">
+                    <span class="result-label">Inference Time:</span>
+                    <span>${data.inference_time_ms.toFixed(2)} ms</span>
+                </div>
+            `;
+            
+            if (data.top_contributors && data.top_contributors.length > 0) {
+                html += `
+                    <div class="contributors">
+                        <div class="result-label">Top Contributing Features (SHAP Values):</div>
+                `;
+                
+                data.top_contributors.forEach(contributor => {
+                    const valueColor = contributor.contribution > 0 ? '#e74c3c' : '#27ae60';
+                    html += `
+                        <div class="contributor-item">
+                            <span>${contributor.feature}</span>
+                            <span style="color: ${valueColor}; font-weight: 600;">
+                                ${contributor.contribution > 0 ? '+' : ''}${contributor.contribution.toFixed(4)}
+                            </span>
+                        </div>
+                    `;
+                });
+                
+                html += `</div>`;
+            }
+            
+            resultDiv.innerHTML = html;
+            resultDiv.classList.remove('error');
+            resultDiv.classList.add('show');
+        }
+        
+        function showError(message) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `
+                <div class="result-header">❌ Error</div>
+                <div class="result-item">${message}</div>
+            `;
+            resultDiv.classList.add('error');
+            resultDiv.classList.add('show');
+        }
+        
+        // Allow Enter key in textarea to trigger prediction (Ctrl+Enter)
+        document.getElementById('features').addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'Enter') {
+                predictThreat();
+            }
+        });
+    </script>
+</body>
+</html>

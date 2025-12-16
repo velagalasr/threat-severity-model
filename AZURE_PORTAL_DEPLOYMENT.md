@@ -30,7 +30,26 @@ Since you can't build directly in portal, use **Azure Cloud Shell** or **Local D
 
 ⚠️ **Important:** Model files are NOT in GitHub (they're too large and in .gitignore). You have 3 options:
 
-**A1. Train models in Cloud Shell:**
+**A1. Upload models to Cloud Shell (EASIEST - Use this if you have models trained locally):**
+1. On your local machine, zip the models:
+```powershell
+Compress-Archive -Path models\*.pkl -DestinationPath models.zip
+```
+
+2. In Azure Cloud Shell, click **Upload/Download files** icon (⬆️)
+3. Upload `models.zip`
+4. Extract and build:
+```bash
+git clone https://github.com/velagalasr/threat-severity-model.git
+cd threat-severity-model
+unzip ~/models.zip -d models/
+
+# Build Docker image and push to ACR
+# If ACR Tasks is not available, use local Docker (Option B below)
+az acr build --registry threatmodelacr --image threat-model-api:latest .
+```
+
+**A2. Train models in Cloud Shell (if ACR Tasks available):**
 1. In Azure Portal, click **Cloud Shell** icon (top right, looks like `>_`)
 2. Choose **Bash**
 3. Clone repo and train models:
@@ -39,8 +58,14 @@ Since you can't build directly in portal, use **Azure Cloud Shell** or **Local D
 git clone https://github.com/velagalasr/threat-severity-model.git
 cd threat-severity-model
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies (use --user flag in Cloud Shell)
+pip install --user -r requirements.txt
+
+# Add user bin to PATH
+export PATH="$HOME/.local/bin:$PATH"
+
+# Add project root to PYTHONPATH (fixes import errors)
+export PYTHONPATH="${PYTHONPATH}:$(pwd)"
 
 # Download dataset
 python data/download_dataset.py
@@ -49,7 +74,7 @@ python data/download_dataset.py
 python scripts/train.py
 
 # Now build Docker image with trained models
-az acr login --name threatmodelacr
+# Note: Cloud Shell doesn't have Docker daemon, so we use ACR's build service
 az acr build --registry threatmodelacr --image threat-model-api:latest .
 ```
 

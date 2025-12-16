@@ -1,0 +1,4 @@
+# Exclude everything except index.html
+*
+!index.html
+!.staticwebapp.config.json
